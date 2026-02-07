@@ -45,7 +45,14 @@ export const registerCompany = async (req, res) => {
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const imageUpload = await cloudinary.uploader.upload(imageFile.path);
+    // Use buffer for Cloudinary (works on Render; path does not)
+    const dataUri = imageFile.buffer
+      ? `data:${imageFile.mimetype || "image/jpeg"};base64,${imageFile.buffer.toString("base64")}`
+      : null;
+    if (!dataUri) {
+      return res.status(400).json({ success: false, message: "Upload your logo" });
+    }
+    const imageUpload = await cloudinary.uploader.upload(dataUri);
 
     const company = new Company({
       name,
