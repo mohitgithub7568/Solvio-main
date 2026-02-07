@@ -1,0 +1,22 @@
+# Optional: Render Blueprint to deploy backend + frontend from one place.
+# See https://render.com/docs/blueprint-spec
+# Add env vars in Render Dashboard (Environment) for each service; do not put secrets here.
+
+services:
+  - type: web
+    name: solvio-backend
+    runtime: node
+    rootDir: backend
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      # Add in Render Dashboard: DATABASE_CONNECTION_URL, JWT_SECRET, CLOUDINARY_*
+
+  - type: static
+    name: solvio-frontend
+    rootDir: frontend
+    buildCommand: npm install && npm run build
+    staticPublishPath: dist
+    # Add in Render Dashboard: VITE_BACKEND_URL = your backend URL (e.g. https://solvio-backend.onrender.com)

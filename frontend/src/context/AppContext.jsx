@@ -86,6 +86,12 @@ export const AppContextProvider = ({ children }) => {
   };
 
   const fetchJobsData = async () => {
+    if (!backendUrl) {
+      if (!jobsFetchedOnce.current) {
+        toast.error("Backend URL not configured. Set VITE_BACKEND_URL and redeploy.");
+      }
+      return;
+    }
     setJobLoading(true);
     try {
       const { data } = await axios.get(`${backendUrl}/job/all-jobs`);
@@ -98,7 +104,7 @@ export const AppContextProvider = ({ children }) => {
     } catch (error) {
       // Only show toast on first load failure to avoid spamming when navigating between Home / All Jobs
       if (!jobsFetchedOnce.current) {
-        toast.error(error?.response?.data?.message || "Failed to fetch jobs.");
+        toast.error(error?.response?.data?.message || "Failed to fetch jobs. Check backend URL and CORS.");
       }
     } finally {
       setJobLoading(false);

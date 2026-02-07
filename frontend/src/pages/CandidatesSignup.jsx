@@ -54,7 +54,12 @@ const CandidatesSignup = () => {
         toast.error(data.message);
       }
     } catch (error) {
-      toast.error(error?.response?.data?.message);
+      const message =
+        error?.response?.data?.message ||
+        (error?.response?.status === 409
+          ? "This email is already registered. Try logging in or use a different email."
+          : "Signup failed. Please try again.");
+      toast.error(message);
     } finally {
       setLoading(false);
     }
