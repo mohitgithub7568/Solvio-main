@@ -36,11 +36,10 @@ export const registerUser = async (req, res) => {
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Upload image to Cloudinary only if provided (buffer works on Render; path does not)
+    // Upload image to Cloudinary only if provided
     let imageUrl = "";
-    if (imageFile && imageFile.buffer) {
-      const dataUri = `data:${imageFile.mimetype || "image/jpeg"};base64,${imageFile.buffer.toString("base64")}`;
-      const imageUploadUrl = await cloudinary.uploader.upload(dataUri);
+    if (imageFile) {
+      const imageUploadUrl = await cloudinary.uploader.upload(imageFile.path);
       imageUrl = imageUploadUrl.secure_url;
     }
 
@@ -62,11 +61,10 @@ export const registerUser = async (req, res) => {
       token,
     });
   } catch (error) {
-    console.error("Register error:", error);
-    const message = error?.message || "Registration failed";
+    console.log(error);
     return res.status(500).json({
       success: false,
-      message: process.env.NODE_ENV === "production" ? "Registration failed. Please try again." : message,
+      message: "Registration failed",
     });
   }
 };
@@ -223,9 +221,7 @@ export const uploadResume = async (req, res) => {
     }
 
     console.log("Uploading to Cloudinary...");
-    // Upload resume to Cloudinary (buffer works on Render; path does not)
-    const resumeDataUri = `data:${resumeFile.mimetype || "application/pdf"};base64,${resumeFile.buffer.toString("base64")}`;
-    const uploadedResumeUrl = await cloudinary.uploader.upload(resumeDataUri, { resource_type: "raw" });
+    const uploadedResumeUrl = await cloudinary.uploader.upload(resumeFile.path);
     console.log("Cloudinary upload successful:", uploadedResumeUrl.secure_url);
 
     // Update user's resume in database
