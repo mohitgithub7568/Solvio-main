@@ -12,7 +12,8 @@ import Cloudinary from "./src/utils/cloudinary.js";
 const app = express();
 
 app.use(bodyParser.json());
-app.use(cors());
+// Allow Vercel frontend; set FRONTEND_URL in Render to your Vercel URL to restrict CORS
+app.use(cors({ origin: process.env.FRONTEND_URL || true }));
 
 connectDB();
 Cloudinary();
